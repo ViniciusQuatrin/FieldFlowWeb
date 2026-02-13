@@ -34,3 +34,6 @@ package-lock.json
 
 ### VS Code ###
 .vscode/
+
+### Secrets ###
+secrets.properties

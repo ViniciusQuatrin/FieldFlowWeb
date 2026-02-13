@@ -6,9 +6,9 @@ Este projeto é uma solução Web Full Stack para o gerenciamento de materiais e
 
 ### Backend
 - **Java 17**
-- **Spring Boot 3+**
+- **Spring Boot 4+**
 - **Spring Data JPA**
-- **H2 Database** (Database em memória)
+- **PostgreSQL** (Banco de Dados Relacional)
 - **JUnit 5** (Testes automatizados)
 
 ### Frontend (Previsto)
@@ -68,3 +68,22 @@ Para executar os testes unitários:
 - `POST /api/materiais`: Cadastra um novo material.
 - `PUT /api/materiais/{id}`: Atualiza um material existente.
 - `GET /api/materiais/{id}`: Busca um material por ID.
+
+## 🐳 Como Executar com Docker (Recomendado)
+
+### Pré-requisitos
+- Docker e Docker Compose instalados.
+- Arquivo `secrets.properties` na raiz do projeto (para desenvolvimento local/build).
+
+### Passos
+1. Navegue até a raiz do projeto.
+2. Execute o comando:
+   ```bash
+   docker-compose up --build
+   ```
+3. Aguarde até que todos os serviços estejam saudáveis.
+
+### Acesso
+- **Frontend**: `http://localhost:4200`
+- **Backend**: `http://localhost:8081/api`
+- **Banco de Dados**: `localhost:5432` (Credenciais no `docker-compose.yml`)
