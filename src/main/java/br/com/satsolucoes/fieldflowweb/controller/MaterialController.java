@@ -2,6 +2,7 @@ package br.com.satsolucoes.fieldflowweb.controller;
 
 import br.com.satsolucoes.fieldflowweb.dto.MaterialDTO;
 import br.com.satsolucoes.fieldflowweb.service.MaterialService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -53,7 +54,7 @@ public class MaterialController {
     // ============ CRUD ============
 
     @PostMapping
-    public ResponseEntity<MaterialDTO> criar(@RequestBody MaterialDTO dto) {
+    public ResponseEntity<MaterialDTO> criar(@Valid @RequestBody MaterialDTO dto) {
         MaterialDTO salvo = materialService.salvar(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -63,7 +64,7 @@ public class MaterialController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MaterialDTO> atualizar(@PathVariable Long id, @RequestBody MaterialDTO dto) {
+    public ResponseEntity<MaterialDTO> atualizar(@PathVariable Long id, @Valid @RequestBody MaterialDTO dto) {
         return ResponseEntity.ok(materialService.atualizar(id, dto));
     }
 }

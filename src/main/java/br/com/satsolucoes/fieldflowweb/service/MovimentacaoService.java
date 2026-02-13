@@ -29,13 +29,14 @@ public class MovimentacaoService {
 
     @Transactional(rollbackFor = Exception.class)
     public MovimentacaoDTO registrar(MovimentacaoDTO dto) {
-        Material material = materialRepository.findById(dto.materialId())
+        // Usar lock pessimista para evitar race condition (Lost Update)
+        Material material = materialRepository.findByIdWithLock(dto.materialId())
                 .orElseThrow(() -> new MaterialNaoEncontradoException(dto.materialId()));
 
-        if (dto.tipo() == TipoMovimentacao.SAIDA) {
-            material.debitarEstoque(dto.quantidade());
-        } else if (dto.tipo() == TipoMovimentacao.ENTRADA) {
-            material.creditarEstoque(dto.quantidade());
+        switch (dto.tipo()) {
+            case SAIDA -> material.debitarEstoque(dto.quantidade());
+            case ENTRADA -> material.creditarEstoque(dto.quantidade());
+            default -> throw new IllegalArgumentException("Tipo de movimentação inválido");
         }
 
         materialRepository.save(material);
@@ -54,7 +55,7 @@ public class MovimentacaoService {
     // ============ LISTAGEM E PAGINAÇÃO ============
 
     public Page<MovimentacaoDTO> listarTodasPaginado(Pageable pageable) {
-        return movimentacaoRepository.findAll(pageable).map(this::toDTO);
+        return movimentacaoRepository.findAllWithMaterial(pageable).map(this::toDTO);
     }
 
     public Page<MovimentacaoDTO> listarPorMaterial(Long materialId, Pageable pageable) {

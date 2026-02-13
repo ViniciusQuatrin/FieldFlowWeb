@@ -3,6 +3,7 @@ package br.com.satsolucoes.fieldflowweb.controller;
 import br.com.satsolucoes.fieldflowweb.dto.MovimentacaoDTO;
 import br.com.satsolucoes.fieldflowweb.model.TipoMovimentacao;
 import br.com.satsolucoes.fieldflowweb.service.MovimentacaoService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -25,7 +26,7 @@ public class MovimentacaoController {
     }
 
     @PostMapping
-    public ResponseEntity<MovimentacaoDTO> registrar(@RequestBody MovimentacaoDTO dto) {
+    public ResponseEntity<MovimentacaoDTO> registrar(@Valid @RequestBody MovimentacaoDTO dto) {
         MovimentacaoDTO salvo = movimentacaoService.registrar(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
