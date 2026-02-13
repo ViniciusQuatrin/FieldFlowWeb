@@ -1,44 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Material {
-  id?: number;
-  nome: string;
-  codigoUnico?: string;
-  quantidadeDisponivel: number;
-  categoria?: string;
-  descricao: string;
-  unidadeMedida: string;
-}
-
-export interface Movimentacao {
-  id?: number;
-  tipo: 'ENTRADA' | 'SAIDA';
-  quantidade: number;
-  dataHora?: string;
-  observacao: string;
-  materialId: number;
-  materialNome?: string;
-}
-
-export interface Page<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+import { Material, Page } from '../models/material.model';
+import { Movimentacao } from '../models/movimentacao.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MaterialService {
 
-  private apiUrl = 'http://localhost:8080/api/materiais';
-  private apiMovimentacoesUrl = 'http://localhost:8080/api/movimentacoes';
+  private apiUrl = `${environment.apiUrl}/materiais`;
+  private apiMovimentacoesUrl = `${environment.apiUrl}/movimentacoes`;
 
-  constructor(private http: HttpClient) { }
+  constructor(@Inject(HttpClient) private http: HttpClient) { }
 
   // --- Materiais ---
 
