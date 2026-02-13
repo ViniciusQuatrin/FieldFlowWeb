@@ -20,18 +20,17 @@ bin/
 ### IntelliJ IDEA ###
 .idea
 *.iws
+### IDE IDs ###
 *.iml
+*.iws
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+### Security & Hygiene ###
+.env
+*.log
+Thumbs.db
+.DS_Store
+package-lock.json
 
 ### VS Code ###
 .vscode/
