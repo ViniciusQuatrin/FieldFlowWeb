@@ -1,14 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { MaterialService, Movimentacao } from '../../services/material.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MaterialService } from '../../services/material.service';
+import { Movimentacao } from '../../models/movimentacao.model';
+import { Subject } from 'rxjs';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
-    selector: 'app-movements',
-    template: `
+  selector: 'app-movements',
+  template: `
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Movimentações</h1>
         <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Histórico de todas as entradas e saídas de estoque.</p>
       </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <strong class="font-bold">Erro!</strong>
+      <span class="block sm:inline"> {{ errorMessage }}</span>
+    </div>
+
+    <!-- Loading Spinner (Simple) -->
+    <div *ngIf="loading" class="flex justify-center mb-4">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
 
     <div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm overflow-hidden">
@@ -43,7 +58,7 @@ import { MaterialService, Movimentacao } from '../../services/material.service';
                 {{ m.observacao || '-' }}
               </td>
             </tr>
-             <tr *ngIf="movimentacoes.length === 0">
+             <tr *ngIf="!loading && movimentacoes.length === 0">
               <td colspan="5" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                  Nenhuma movimentação registrada.
               </td>
@@ -55,10 +70,10 @@ import { MaterialService, Movimentacao } from '../../services/material.service';
        <!-- Pagination (Simple Previous/Next for MVP) -->
       <div class="bg-white dark:bg-surface-dark px-4 py-3 flex items-center justify-between border-t border-slate-200 dark:border-slate-700/50 sm:px-6">
         <div class="flex-1 flex justify-between sm:justify-end gap-3">
-          <button (click)="loadMovimentacoes(page - 1)" [disabled]="page === 0" class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark hover:bg-slate-50 dark:hover:bg-surface-dark-lighter disabled:opacity-50">
+          <button (click)="loadMovimentacoes(page - 1)" [disabled]="page === 0 || loading" class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark hover:bg-slate-50 dark:hover:bg-surface-dark-lighter disabled:opacity-50">
             Anterior
           </button>
-          <button (click)="loadMovimentacoes(page + 1)" [disabled]="page >= totalPages - 1" class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark hover:bg-slate-50 dark:hover:bg-surface-dark-lighter disabled:opacity-50">
+          <button (click)="loadMovimentacoes(page + 1)" [disabled]="page >= totalPages - 1 || loading" class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark hover:bg-slate-50 dark:hover:bg-surface-dark-lighter disabled:opacity-50">
             Próxima
           </button>
         </div>
@@ -67,24 +82,48 @@ import { MaterialService, Movimentacao } from '../../services/material.service';
     </div>
   `
 })
-export class MovementsComponent implements OnInit {
-    movimentacoes: Movimentacao[] = [];
-    page = 0;
-    size = 10;
-    totalPages = 0;
+export class MovementsComponent implements OnInit, OnDestroy {
+  movimentacoes: Movimentacao[] = [];
+  page = 0;
+  size = 10;
+  totalPages = 0;
+  loading = false;
+  errorMessage: string | null = null;
+  private destroy$ = new Subject<void>();
 
-    constructor(private service: MaterialService) { }
+  constructor(private service: MaterialService) { }
 
-    ngOnInit() {
-        this.loadMovimentacoes(0);
-    }
+  ngOnInit() {
+    this.loadMovimentacoes(0);
+  }
 
-    loadMovimentacoes(page: number) {
-        if (page < 0) return;
-        this.service.listarMovimentacoes(page, this.size).subscribe(res => {
-            this.movimentacoes = res.content;
-            this.totalPages = res.totalPages;
-            this.page = res.number;
-        });
-    }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadMovimentacoes(page: number) {
+    if (page < 0) return;
+
+    this.loading = true;
+    this.errorMessage = null;
+
+    this.service.listarMovimentacoes(page, this.size)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          this.errorMessage = 'Erro ao carregar movimentações. Tente novamente mais tarde.';
+          console.error('Erro ao carregar movimentações:', error);
+          return of(null);
+        }),
+        finalize(() => this.loading = false)
+      )
+      .subscribe(res => {
+        if (res) {
+          this.movimentacoes = res.content;
+          this.totalPages = res.totalPages;
+          this.page = res.number;
+        }
+      });
+  }
 }
