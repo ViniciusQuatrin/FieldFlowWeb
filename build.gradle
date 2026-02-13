@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.2'
@@ -18,13 +20,26 @@ repositories {
     mavenCentral()
 }
 
+def secretsFile = file("secrets.properties")
+def secrets = new Properties()
+if (secretsFile.exists()) {
+    secrets.load(new FileInputStream(secretsFile))
+}
+
+processResources {
+    filesMatching("**/application.properties") {
+        filter(ReplaceTokens, tokens: [dbPassword: secrets.getProperty('dbPassword', '')])
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
