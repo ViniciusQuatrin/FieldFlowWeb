@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fieldflow-db
+    environment:
+      POSTGRES_DB: fieldflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fieldflow-network
+
+  backend:
+    build: .
+    container_name: fieldflow-backend
+    ports:
+      - "8081:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/fieldflow
+      DB_USERNAME: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fieldflow-network
+
+  frontend:
+    build: ./frontend
+    container_name: fieldflow-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - fieldflow-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  fieldflow-network:
+    driver: bridge
