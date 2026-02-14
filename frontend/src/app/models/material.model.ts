@@ -4,7 +4,7 @@ export interface Material {
     codigoUnico?: string;
     quantidadeDisponivel: number;
     categoria?: string;
-    descricao: string;
+    descricao?: string;
     unidadeMedida: string;
 }
 

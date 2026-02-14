@@ -20,7 +20,7 @@ public class Material {
     @Column(nullable = false)
     private BigDecimal quantidadeDisponivel;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String descricao;
 
     @Column(nullable = false)
@@ -97,8 +97,10 @@ public class Material {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Material material = (Material) o;
         return Objects.equals(id, material.id);
     }
@@ -108,5 +110,3 @@ public class Material {
         return Objects.hash(id);
     }
 }
-
-
