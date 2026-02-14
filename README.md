@@ -24,6 +24,26 @@ O projeto segue uma arquitetura em camadas padrão de mercado:
 - `dto`: Objetos de transferência de dados.
 - `config`: Configurações globais (ex: CORS).
 
+
+## 🐳 Como Executar com Docker (Recomendado)
+
+### Pré-requisitos
+- Docker e Docker Compose instalados.
+- Arquivo `secrets.properties` na raiz do projeto (para desenvolvimento local/build).
+
+### Passos
+1. Navegue até a raiz do projeto.
+2. Execute o comando:
+   ```bash
+   docker-compose up --build
+   ```
+3. Aguarde até que todos os serviços estejam saudáveis.
+
+### Acesso
+- **Frontend**: `http://localhost:4200`
+- **Backend**: `http://localhost:8081/api`
+- **Banco de Dados**: `localhost:5432`
+
 ## 🛠️ Como Executar o Backend
 
 ### Pré-requisitos
@@ -36,7 +56,7 @@ O projeto segue uma arquitetura em camadas padrão de mercado:
    - **Linux/Mac**: `./gradlew bootRun`
    - **Windows**: `gradlew.bat bootRun`
 
-A aplicação estará disponível em: `http://localhost:8080/api/materiais`
+A aplicação estará disponível em: `http://localhost:8081/api/materiais`
 
 ## 🎨 Como Executar o Frontend
 
@@ -69,21 +89,3 @@ Para executar os testes unitários:
 - `PUT /api/materiais/{id}`: Atualiza um material existente.
 - `GET /api/materiais/{id}`: Busca um material por ID.
 
-## 🐳 Como Executar com Docker (Recomendado)
-
-### Pré-requisitos
-- Docker e Docker Compose instalados.
-- Arquivo `secrets.properties` na raiz do projeto (para desenvolvimento local/build).
-
-### Passos
-1. Navegue até a raiz do projeto.
-2. Execute o comando:
-   ```bash
-   docker-compose up --build
-   ```
-3. Aguarde até que todos os serviços estejam saudáveis.
-
-### Acesso
-- **Frontend**: `http://localhost:4200`
-- **Backend**: `http://localhost:8081/api`
-- **Banco de Dados**: `localhost:5432` (Credenciais no `docker-compose.yml`)
