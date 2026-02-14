@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MaterialService, Material, Page, Movimentacao } from '../../services/material.service';
+import { MaterialService } from '../../services/material.service';
+import { Material, Page } from '../../models/material.model';
+import { Movimentacao } from '../../models/movimentacao.model';
 
 @Component({
   selector: 'app-dashboard',

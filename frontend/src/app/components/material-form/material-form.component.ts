@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MaterialService, Material } from '../../services/material.service';
+import { MaterialService } from '../../services/material.service';
+import { Material } from '../../models/material.model';
 
 @Component({
   selector: 'app-material-form',
